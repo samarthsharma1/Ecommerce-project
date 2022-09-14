@@ -12,6 +12,7 @@ function addToCart(event) {
     let image = itemTobeAdded.getElementsByClassName('images')[0].src
     let price = itemTobeAdded.getElementsByClassName('amount')[0].innerText
    addingItem(title,image,price)
+   
 }
 
 function addingItem(title,image,price) {
@@ -30,5 +31,25 @@ function addingItem(title,image,price) {
 </div>`
 cartRow.innerHTML = content
 cartItems.append(cartRow)
+alert('Product Successfully Added')
 }
 
+
+
+let open = document.getElementsByClassName("seecart");
+const close = document.getElementById("close");
+const container = document.getElementById("container");
+
+for(let i=0;i<open.length;i++) {
+    let btn=open[i]
+    btn.addEventListener("click", showcart)
+    
+}
+
+function showcart() {
+    container.classList.add("active");
+}
+
+close.addEventListener("click", () => {
+    container.classList.remove("active");
+});

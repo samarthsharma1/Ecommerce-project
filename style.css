@@ -277,7 +277,50 @@ margin-top: 0rem;
   font-size: 50px;
 }
 
+.popup-container {
+position: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+right: 0;
+background-color: rgba(0, 0, 0, 0.5);
 
+display: none;
+align-items: center;
+justify-content: center;
+}
+
+.popup-container.active {
+display: flex;
+justify-content: right;
+
+
+}
+
+.popup {
+background-color: #fff;
+border-radius: 5px;
+box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+padding: 2rem;
+position: fixed;
+width: 500px;
+height: 800px;
+}
+
+#close{
+background-color:red;
+color: black;
+font-size: 16px;
+position: absolute;
+cursor:pointer;
+top: 0;
+right: 0;
+margin:20px;
+font-weight: 700;
+border: 1px solid rgb(121,117,117);
+border-radius: 7px;
+padding: 5px;
+}
 
 
 .divider{
