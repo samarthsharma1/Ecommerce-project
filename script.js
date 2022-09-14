@@ -53,3 +53,35 @@ function showcart() {
 close.addEventListener("click", () => {
     container.classList.remove("active");
 });
+
+
+window.addEventListener('DOMContentLoaded',()=>{
+    axios.get('http://localhost:3000/products')
+    .then((productInfo)=>{
+        // console.log(productInfo)
+        if(productInfo.request.status === 200)  { 
+            const products = productInfo.data.products
+            // console.log(products)
+            
+            const parent = document.getElementById('products')
+            
+            products.forEach(products=>{
+                const childHTML = ` <div class="albums">
+                <h3 class="title">${products.title}</h3>
+                <img
+                  class="images"
+                  src="${products.imageUrl}"
+                  alt="${products.title}"
+                />
+                <div class="price">
+                  <h4 class="amount">${products.price}$</h4>
+                  <button class="addcart">Add to Cart</button>
+                </div>
+              </div>`
+
+              parent.innerHTML += childHTML
+            })
+        }
+       
+    })
+})
