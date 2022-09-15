@@ -1,41 +1,105 @@
+let c = 0;
+let cc = 1;
+let pag = document.getElementById('pagination');
+
 // Show products on front end
 
 window.addEventListener("DOMContentLoaded", () => {
-  axios.get("http://localhost:3000/products").then((productInfo) => {
+  axios.get("http://localhost:3000/limited?page=0").then((productInfo) => {
     if (productInfo.request.status === 200) {
-      const products = productInfo.data.products;
-
-      const parent = document.getElementById("products");
-
-      products.forEach((products) => {
-        const childHTML = ` <div class="albums">
-        
-                <h3 class="title">${products.title}</h3>
+      let products = productInfo.data.products;
+      let childHTML = "";
+      let parent = document.getElementById("products");
+      // console.log(products,parent)
+      products.forEach((product) => {
+         childHTML += ` <div class="albums">
+                <input type="hidden" id="hidden" value="${product.id}">
+                <h3 class="title">${product.title}</h3>
                 <img
                   class="images"
-                  src="${products.imageUrl}"
-                  alt="${products.title}"
+                  src="${product.imageUrl}"
+                  alt="${product.title}"
                 />
                 <div class="price">
-                  <h4 class="amount">${products.price}$</h4>
-                  <button class="addcart" onclick="addtocart(${products.id})">Add to Cart</button>
+                  <h4 class="amount">${product.price}$</h4>
+                  <button class="addcart" onclick="addtocart(${product.id})">Add to Cart</button>
+                  
                 </div>
               </div>`;
 
-        parent.innerHTML += childHTML;
-      });
-      cart()
+        });
+        parent.innerHTML = childHTML;
     }
   });
-
   showingCart();
+  pagination()
 });
 
+function pagination(e) {
+  axios.get("http://localhost:3000/products")
+  .then((productInfo)=>{
+    let number_of_pages;
+    if(productInfo.data.products.length % 2 == 0) {
+       number_of_pages = Math.trunc(((productInfo.data.products.length)/2))
+    } else {
+       number_of_pages = Math.trunc(((productInfo.data.products.length)/2)+1)
+    }
+   
+    for (let i = 0; i < number_of_pages; i++) {
+      pag.innerHTML += `<button class="pagebtn" id="?page=${c++}">${cc++}</button> `;
+    }
+  })
+  .catch(err=>console.log(err))
+}
+
+pag.addEventListener('click', (e)=>{
+  let id = e.target.id;
+  console.log(id)
+  axios.get(`http://localhost:3000/limited${id}`)
+  .then(productInfo=>{
+    let products = productInfo.data.products;
+     let childHTML="";
+      let parent = document.getElementById("products");
+      // console.log(products,parent)
+      products.forEach((product) => {
+         childHTML += ` <div class="albums">
+                <input type="hidden" id="hidden" value="${product.id}">
+                <h3 class="title">${product.title}</h3>
+                <img
+                  class="images"
+                  src="${product.imageUrl}"
+                  alt="${product.title}"
+                />
+                <div class="price">
+                  <h4 class="amount">${product.price}$</h4>
+                  <button class="addcart" onclick="addtocart(${product.id})">Add to Cart</button>
+                  
+                </div>
+              </div>`;
+
+        
+      });
+      parent.innerHTML = childHTML;
+  })
+  .catch(err=>console.log(err))
+})
+
 function addtocart(productId) {
+ let albums = document.querySelectorAll('.albums')
+
+
+ for(let i=0;i<albums.length;i++) {
+ if(productId == albums[i].querySelector('#hidden').value)
+ {
+  return alert('Product Already Exists')
+ }
+ } 
   axios
     .post("http://localhost:3000/cart", { productId: productId })
     .then((response) => {
-      if (response.status === 400) {
+      
+      if (response.status === 200) {
+        showingCart();
         notifyusers(response.data.message);
       } else {
         throw new Error(response.data.message);
@@ -43,119 +107,74 @@ function addtocart(productId) {
     })
     .catch((err) => {
       notifyusers(err);
-     
     });
-  showingCart();
 }
 
 function notifyusers(message) {
-  alert(`${message}`);
+  alert(message)
 }
 
 function showingCart() {
-  axios.get("http://localhost:3000/cart")
-  .then((data) => {
-    if(data.status === 200) {
+  axios
+    .get("http://localhost:3000/cart")
+    .then((data) => {
+      if (data.status === 200) {
         let products = data.data.products;
-        let cartRow = document.createElement("li");
-       cartRow.classList = "cart-row";
-       let cartItems = document.getElementsByClassName("cart-items")[0];
-       products.forEach((products) => {
-        //  let content = ` <div class="cart-item cart-column">
-        //        <div class="divider">
-        //        <img class="cart-item-image" src=${products.imageUrl} width="100" height="100">
-        //        <span class="cart-item-title">${products.title}</span>
-        //        </div>
-        //        <span class="cart-price cart-column">${products.price}</span>
-        //        <div class="cart-quantity cart-column">
-        //        <input class="cart-quantity-input" type="number" value="${products.cartItem.quantity}">
+        
+        let cartItems = document.getElementsByClassName("cart-items")[0];
+        cartItems.innerHTML = ''
+        // console.log(cartItems)
+        products.forEach((product) => {
+          let cartRow = document.createElement("div");
+           cartRow.className = "cart-row2";
+           
+          let content = ` <div class="cart-item cart-column">
+               <div class="divider">
+               <img class="cart-item-image" src=${product.imageUrl} width="100" height="100">
+               
+               <span class="cart-item-title">${product.title}</span>
+               </div>
+               <span class="cart-price cart-column">${product.price}</span>
+               <div class="cart-quantity cart-column">
+               <input class="cart-quantity-input" type="number" value="${product.cartItem.quantity}" change="addtocart${product.id}">
               
-        //        <button class="btn btn-danger" type="button">REMOVE</button>
-        //        </div><br>
-        //        </div>`;
-         let content = `<div class="cart_new">
-            <img class="cart-item-image" src=${products.imageUrl} width="100" height="100">
-                           </div>`
+               <button class="btn btn-danger" type="button" onclick="removeItem(${product.id})">REMOVE</button>
+               </div>
+               </div>`;
 
-         cartRow.innerHTML += content;
-       });
-   
-       cartItems.append(cartRow);
-    } else {
-        throw new Error('Something went wrong')
-    }
-   
-  })
-  .catch((err)=>{
-      notifyusers(err)
-  })
+          cartRow.innerHTML = content;
+          cartItems.append(cartRow);
+        });
+
+        
+       
+        updateCartTotal();
+        qtyChanged()
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((err) => {
+      notifyusers(err);
+    });
 }
 
-// // adding to cart
-// function cart() {
-//   let addcartBtn = document.getElementsByClassName("addcart");
 
-//   for (let i = 0; i < addcartBtn.length; i++) {
-//     let btn = addcartBtn[i]
-//      btn.addEventListener("click", addToCart);
-//   }
-
-//   function addToCart(event) {
-
-//     let button = event.target;
-//     let itemTobeAdded = button.parentElement.parentElement;
-//     let title = itemTobeAdded.getElementsByClassName("title")[0].innerText;
-//     let image = itemTobeAdded.getElementsByClassName("images")[0].src;
-//     let price = itemTobeAdded.getElementsByClassName("amount")[0].innerText;
-//     addingItem(title, image, price);
-//   }
-
-//   function addingItem(title, image, price) {
-//     let cartRow = document.createElement("div");
-//     cartRow.classList = "cart-row";
-//     let cartItems = document.getElementsByClassName("cart-items")[0];
-//     console.log(cartItems);
-
-//     let content = ` <div class="cart-item cart-column">
-//     <img class="cart-item-image" src=${image} width="100" height="100">
-//     <span class="cart-item-title">${title}</span>
-//     </div>
-//     <span class="cart-price cart-column">${price}</span>
-//     <div class="cart-quantity cart-column">
-//     <input class="cart-quantity-input" type="number" value="1">
-//     <button class="btn btn-danger" type="button">REMOVE</button>
-//     </div>`;
-
-//     cartRow.innerHTML = content;
-
-//     if (cartItems.childElement === cartRow) {
-//        alert("Product already exists!!");
-//     } else {
-//       cartItems.append(cartRow);
-//       alert("Product Successfully Added");
-//     }
-//     removeItem();
-//     updateCartTotal();
-//     qtyChanged()
-//   }
-// }
 
 // removing item from cart
 
-function removeItem() {
-  let removebtn = document.getElementsByClassName("btn-danger");
-  for (let i = 0; i < removebtn.length; i++) {
-    let button = removebtn[i];
-    button.addEventListener("click", function (event) {
-      let btn = event.target;
-      btn.parentElement.parentElement.remove();
-      updateCartTotal();
-    });
-  }
+function removeItem(productId) {
+  // console.log(productId)
+ axios.delete(`http://localhost:3000/cart-delete-item/${productId}`)
+ .then(response=>{
+  console.log(response)
+  updateCartTotal()
+ })
 }
 
 function qtyChanged() {
   let qtyval = document.getElementsByClassName("cart-quantity-input");
+  console.log(qtyval)
   for (let i = 0; i < qtyval.length; i++) {
     let qty = qtyval[i];
     qty.addEventListener("change", quantityChanges);
@@ -167,26 +186,33 @@ function quantityChanges(event) {
   if (isNaN(value.value) || value.value <= 0) {
     value.value = 1;
   }
+
   updateCartTotal();
 }
 
 // updating cart total
 
 function updateCartTotal() {
-  let cartItem = document.getElementsByClassName("cart-items")[0];
-  let cartRows = document.getElementsByClassName("cart-row");
+  let cartItems = document.getElementsByClassName("cart-items")[0];
+  var cartRows = cartItems.querySelectorAll(".cart-row2");
+  // console.log(cartRows)
   let total = 0;
-  for (let i = 1; i < cartRows.length; i++) {
-    let cartRow = cartRows[i];
-    let price = document.getElementsByClassName("cart-price")[i];
-    let priceValue = parseFloat(price.innerText.replace("$", ""));
-    let quantity = document.getElementsByClassName("cart-quantity-input")[0];
-    let qty = quantity.value;
-    console.log(price);
-    total += priceValue * qty;
+  for (
+    let i = 0;
+    i < cartRows.length;
+    i++
+  ) {
+    total +=
+      Number(
+        cartRows[i].querySelector(".cart-price").innerText
+      ) *
+      Number(
+        cartRows[i].querySelector(".cart-quantity-input").value
+      );
   }
-
-  document.getElementsByClassName("cart-total-price")[0].innerText = total;
+  document.getElementsByClassName("cart-total-price")[0].innerText =
+    "$" + total;
+  // console.log(document.getElementsByClassName("cart-total-price")[0].innerText);
 }
 
 // cart pop-up model
