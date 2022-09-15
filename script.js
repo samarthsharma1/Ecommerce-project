@@ -4,8 +4,7 @@ window.addEventListener("DOMContentLoaded", () => {
   axios.get("http://localhost:3000/products").then((productInfo) => {
     if (productInfo.request.status === 200) {
       const products = productInfo.data.products;
-      
-    //   console.log(products)
+
       const parent = document.getElementById("products");
 
       products.forEach((products) => {
@@ -22,82 +21,123 @@ window.addEventListener("DOMContentLoaded", () => {
                   <button class="addcart" onclick="addtocart(${products.id})">Add to Cart</button>
                 </div>
               </div>`;
-        
-        parent.innerHTML += childHTML;
 
+        parent.innerHTML += childHTML;
       });
-    //   cart();
+      cart()
     }
   });
+
+  showingCart();
 });
 
 function addtocart(productId) {
-    axios.post('http://localhost:3000/cart',{productId:productId})
-    .then((response)=>{
-        if(response.status === 400){
-            notifyusers(response.data.message)
-        } else {
-           throw new Error()
-        }
-       
+  axios
+    .post("http://localhost:3000/cart", { productId: productId })
+    .then((response) => {
+      if (response.status === 400) {
+        notifyusers(response.data.message);
+      } else {
+        throw new Error(response.data.message);
+      }
     })
-    .catch((err)=>{
-        notifyusers(err.data.message)
-    })
+    .catch((err) => {
+      notifyusers(err);
+     
+    });
+  showingCart();
 }
 
 function notifyusers(message) {
-   alert(`${message}`)
+  alert(`${message}`);
+}
+
+function showingCart() {
+  axios.get("http://localhost:3000/cart")
+  .then((data) => {
+    if(data.status === 200) {
+        let products = data.data.products;
+        let cartRow = document.createElement("li");
+       cartRow.classList = "cart-row";
+       let cartItems = document.getElementsByClassName("cart-items")[0];
+       products.forEach((products) => {
+        //  let content = ` <div class="cart-item cart-column">
+        //        <div class="divider">
+        //        <img class="cart-item-image" src=${products.imageUrl} width="100" height="100">
+        //        <span class="cart-item-title">${products.title}</span>
+        //        </div>
+        //        <span class="cart-price cart-column">${products.price}</span>
+        //        <div class="cart-quantity cart-column">
+        //        <input class="cart-quantity-input" type="number" value="${products.cartItem.quantity}">
+              
+        //        <button class="btn btn-danger" type="button">REMOVE</button>
+        //        </div><br>
+        //        </div>`;
+         let content = `<div class="cart_new">
+            <img class="cart-item-image" src=${products.imageUrl} width="100" height="100">
+                           </div>`
+
+         cartRow.innerHTML += content;
+       });
+   
+       cartItems.append(cartRow);
+    } else {
+        throw new Error('Something went wrong')
+    }
+   
+  })
+  .catch((err)=>{
+      notifyusers(err)
+  })
 }
 
 // // adding to cart
-// // function cart() {
-// //   let addcartBtn = document.getElementsByClassName("addcart");
+// function cart() {
+//   let addcartBtn = document.getElementsByClassName("addcart");
 
-// //   for (let i = 0; i < addcartBtn.length; i++) {
-// //     let btn = addcartBtn[i]
-// //      btn.addEventListener("click", addToCart);
-// //   }
+//   for (let i = 0; i < addcartBtn.length; i++) {
+//     let btn = addcartBtn[i]
+//      btn.addEventListener("click", addToCart);
+//   }
 
-// //   function addToCart(event) {
-   
+//   function addToCart(event) {
 
-// //     let button = event.target;
-// //     let itemTobeAdded = button.parentElement.parentElement;
-// //     let title = itemTobeAdded.getElementsByClassName("title")[0].innerText;
-// //     let image = itemTobeAdded.getElementsByClassName("images")[0].src;
-// //     let price = itemTobeAdded.getElementsByClassName("amount")[0].innerText;
-// //     addingItem(title, image, price);
-// //   }
+//     let button = event.target;
+//     let itemTobeAdded = button.parentElement.parentElement;
+//     let title = itemTobeAdded.getElementsByClassName("title")[0].innerText;
+//     let image = itemTobeAdded.getElementsByClassName("images")[0].src;
+//     let price = itemTobeAdded.getElementsByClassName("amount")[0].innerText;
+//     addingItem(title, image, price);
+//   }
 
-// //   function addingItem(title, image, price) {
-// //     let cartRow = document.createElement("div");
-// //     cartRow.classList = "cart-row";
-// //     let cartItems = document.getElementsByClassName("cart-items")[0];
-// //     console.log(cartItems);
+//   function addingItem(title, image, price) {
+//     let cartRow = document.createElement("div");
+//     cartRow.classList = "cart-row";
+//     let cartItems = document.getElementsByClassName("cart-items")[0];
+//     console.log(cartItems);
 
-// //     let content = ` <div class="cart-item cart-column">
-// //     <img class="cart-item-image" src=${image} width="100" height="100">
-// //     <span class="cart-item-title">${title}</span>
-// //     </div>
-// //     <span class="cart-price cart-column">${price}</span>
-// //     <div class="cart-quantity cart-column">
-// //     <input class="cart-quantity-input" type="number" value="1">
-// //     <button class="btn btn-danger" type="button">REMOVE</button>
-// //     </div>`;
+//     let content = ` <div class="cart-item cart-column">
+//     <img class="cart-item-image" src=${image} width="100" height="100">
+//     <span class="cart-item-title">${title}</span>
+//     </div>
+//     <span class="cart-price cart-column">${price}</span>
+//     <div class="cart-quantity cart-column">
+//     <input class="cart-quantity-input" type="number" value="1">
+//     <button class="btn btn-danger" type="button">REMOVE</button>
+//     </div>`;
 
-// //     cartRow.innerHTML = content;
+//     cartRow.innerHTML = content;
 
-// //     if (cartItems.childElement === cartRow) {
-// //        alert("Product already exists!!");
-// //     } else {
-// //       cartItems.append(cartRow);
-// //       alert("Product Successfully Added");
-// //     }
-// //     removeItem();
-// //     updateCartTotal();
-// //     qtyChanged()
-// //   }
+//     if (cartItems.childElement === cartRow) {
+//        alert("Product already exists!!");
+//     } else {
+//       cartItems.append(cartRow);
+//       alert("Product Successfully Added");
+//     }
+//     removeItem();
+//     updateCartTotal();
+//     qtyChanged()
+//   }
 // }
 
 // removing item from cart
@@ -115,19 +155,19 @@ function removeItem() {
 }
 
 function qtyChanged() {
-    let qtyval = document.getElementsByClassName("cart-quantity-input")
-    for(let i=0;i<qtyval.length;i++){
-        let qty = qtyval[i]
-        qty.addEventListener('change',quantityChanges)
-    }
+  let qtyval = document.getElementsByClassName("cart-quantity-input");
+  for (let i = 0; i < qtyval.length; i++) {
+    let qty = qtyval[i];
+    qty.addEventListener("change", quantityChanges);
+  }
 }
- 
+
 function quantityChanges(event) {
-    let value = event.target
-    if(isNaN(value.value) || value.value<=0) {
-        value.value = 1
-    }
-    updateCartTotal()
+  let value = event.target;
+  if (isNaN(value.value) || value.value <= 0) {
+    value.value = 1;
+  }
+  updateCartTotal();
 }
 
 // updating cart total
