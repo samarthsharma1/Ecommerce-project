@@ -125,7 +125,7 @@ width:50%
 }
 
 #mycart {
-  left: 300px;
+  left: 280px;
   position: relative;
   height: 60px;
   border: 2px solid lightcoral;
@@ -200,14 +200,14 @@ align-items: center;
 
 .btn-danger {
   color: white;
-  background-color: #EB5757;
+  background-color: darkred;
   border: none;
   border-radius: .3em;
   font-weight: bold;
 }
 
 .btn-danger:hover {
-  background-color: #CC4C4C;
+  background-color: darkred;
 }
 
 .cart-quantity-input {

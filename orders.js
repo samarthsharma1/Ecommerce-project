@@ -29,10 +29,10 @@
                  alt=""
                />
                <div class="card-item-desc" >
-                 <h4>${product.title}</h4>
-                 <h4>$ ${product.price}</h4>
-                 <h4>qty:${product.orderItem.quantity}</h4>
-                 <h4>${product.description}</h4>
+                 <h4>Product Title : ${product.title}</h4>
+                 <h4>Product Price:  $ ${product.price}</h4>
+                 <h4>Price Quantity: ${product.orderItem.quantity}</h4>
+                 <h4>Product Description : ${product.description}</h4>
                  <p hidden>${totalprice+=parseFloat(product.price)*parseInt(product.orderItem.quantity)}</p>
                </div>   
              </div>`
